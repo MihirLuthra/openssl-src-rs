@@ -157,6 +157,14 @@ impl Build {
             // No support for multiple providers yet
             .arg("no-legacy");
 
+        if target == "sparcv9-sun-solaris" {
+            // On building without this for solaris, openssl resorts to getentropy(2). Although, it is available on
+            // Solaris 11.3 but for some reason the library built is resorting to depend on libc.so.1 (ILLUMOS_0.12)
+            // which is not found on solaris.
+            // Would like to go into its details later but for now just switched to use devrandom.
+            configure.arg("--with-rand-seed=devrandom");
+        }
+
         if cfg!(not(feature = "weak-crypto")) {
             configure
                 .arg("no-md2")
